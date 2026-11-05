@@ -1,0 +1,21 @@
+export type Point = { n: number; group: string; title: string; detail: string; original: string };
+export type Plan = {
+  updated: string;
+  leadershipRule: string;
+  groups: { id: string; title: string }[];
+  points: Point[];
+  loops: { name: string; points: number[]; meaning: string }[];
+  failurePatterns: string[];
+  first90: string[];
+  guidance: { title: string; points: number[]; bullets: string[] }[];
+  recommendations: { id: string; title: string; detail: string }[];
+  rhythm: { cadence: string; what: string; points: number[] }[];
+  managerBrings: string[];
+  scorecard: string[];
+  currentOps: { intent: string; already: string; gap: string }[];
+  done90: string[];
+  departments: { name: string; manager: string; designations: string; owns: string; app: string }[];
+  gaps: string;
+  seedSheets: Record<string, string>[];
+};
+export type Row = Record<string, string> & { id: string };
