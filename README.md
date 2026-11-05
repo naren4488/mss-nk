@@ -43,6 +43,8 @@ npm run build     # outputs the static site to dist/
 npm run content   # re-encrypt only, after editing the plan .md
 ```
 
+When you edit the plan markdown, run `npm run content` locally and **commit `public/plan.enc.json`**. Hosts like Vercel do not have the plan markdown or the password, so they build from that committed encrypted file. Don't set `DIRECTOR_PASSWORD` on the host.
+
 When you edit the plan markdown, run the build again. The site reads the plan's headings, numbered points and tables, so keep the existing format.
 
 ## Deploying

@@ -1,5 +1,6 @@
 // Reads the director plan markdown, turns it into structured JSON, and
 // encrypts it with the portal password (PBKDF2 → AES-GCM).
+// The encrypted output is committed so hosts can build without the plan or password.
 // Output: public/plan.enc.json — the only copy of the plan that ships.
 //
 // Password comes from DIRECTOR_PASSWORD (env) or .env.local.
@@ -26,11 +27,19 @@ function loadEnvLocal() {
 
 const env = { ...loadEnvLocal(), ...process.env };
 const password = env.DIRECTOR_PASSWORD;
-if (!password) {
-  console.error("DIRECTOR_PASSWORD missing. Put it in mss-nk/.env.local");
+const planPath = resolve(root, env.PLAN_MD || "../docs/DIRECTOR_COMPANY_IMPROVEMENT_PLAN.md");
+const encPath = resolve(root, "public/plan.enc.json");
+
+// On a host (Vercel etc.) the plan markdown and password are not available.
+// Fall back to the committed, already-encrypted plan.
+if (!password || !existsSync(planPath)) {
+  if (existsSync(encPath)) {
+    console.log(`Using committed public/plan.enc.json (${!password ? "no DIRECTOR_PASSWORD" : "plan markdown not found"}).`);
+    process.exit(0);
+  }
+  console.error(!password ? "DIRECTOR_PASSWORD missing. Put it in mss-nk/.env.local" : `Plan not found: ${planPath}`);
   process.exit(1);
 }
-const planPath = resolve(root, env.PLAN_MD || "../docs/DIRECTOR_COMPANY_IMPROVEMENT_PLAN.md");
 const md = readFileSync(planPath, "utf8");
 const lines = md.split("\n");
 
