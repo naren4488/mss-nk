@@ -132,3 +132,14 @@ tr.done { opacity: 0.55; }
   .toolbar input, .toolbar select { min-width: 0; flex: 1; }
   .card-head { flex-wrap: wrap; }
 }
+
+/* password show/hide */
+.pw-wrap { position: relative; }
+.pw-wrap input { padding-right: 42px; }
+.pw-eye {
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  background: transparent; border: 0; color: var(--muted); cursor: pointer;
+  width: 34px; height: 34px; display: grid; place-items: center; border-radius: 6px;
+}
+.pw-eye:hover { color: var(--white); }
+.pw-eye:focus-visible { outline: 2px solid var(--yellow); }
