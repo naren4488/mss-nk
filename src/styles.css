@@ -143,3 +143,16 @@ tr.done { opacity: 0.55; }
 }
 .pw-eye:hover { color: var(--white); }
 .pw-eye:focus-visible { outline: 2px solid var(--yellow); }
+
+/* tasks catalog */
+.chips-scroll { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 8px; scrollbar-width: thin; }
+.pick { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; flex-shrink: 0; text-align: left;
+  background: var(--navy-2); color: var(--white); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; cursor: pointer;
+  font: 500 0.9rem "Poppins", sans-serif; }
+.pick:hover { border-color: var(--muted); }
+.pick.on { border-color: var(--yellow); color: var(--yellow); }
+.task-list { list-style: none; margin: 0; padding: 0; }
+.task-list li { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.task-list li.multi .num { outline: 1px solid var(--yellow); }
+.who { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px; }
+.who .chip { white-space: normal; }

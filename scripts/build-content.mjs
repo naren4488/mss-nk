@@ -29,6 +29,8 @@ const env = { ...loadEnvLocal(), ...process.env };
 const password = env.DIRECTOR_PASSWORD;
 const planPath = resolve(root, env.PLAN_MD || "../docs/DIRECTOR_COMPANY_IMPROVEMENT_PLAN.md");
 const encPath = resolve(root, "public/plan.enc.json");
+// Operations task catalog (moved from the admin app on 7 Nov 2026).
+const tasksPath = resolve(root, env.TASKS_JSON || "../docs/mss-nk/tasks-catalog.json");
 
 // On a host (Vercel etc.) the plan markdown and password are not available.
 // Fall back to the committed, already-encrypted plan.
@@ -154,7 +156,9 @@ const updated = (lines.find((l) => l.startsWith("**Updated:**")) || "").replace(
 const plan = {
   updated, leadershipRule, groups, points, loops, failurePatterns, first90, guidance, recommendations,
   rhythm, managerBrings, scorecard, currentOps, done90, departments, gaps, seedSheets,
+  tasks: existsSync(tasksPath) ? JSON.parse(readFileSync(tasksPath, "utf8")) : undefined,
 };
+if (!plan.tasks) console.warn(`Task catalog not found (${tasksPath}); the Tasks page will be empty.`);
 
 if (points.length === 0) throw new Error("No points parsed — check the plan format");
 
@@ -177,4 +181,4 @@ writeFileSync(
   resolve(root, "public/plan.enc.json"),
   JSON.stringify({ v: 1, iterations, salt: b64(salt), iv: b64(iv), data: b64(cipher) }),
 );
-console.log(`plan.enc.json: ${points.length} points, ${recommendations.length} recs, ${departments.length} departments (from ${planPath})`);
+console.log(`plan.enc.json: ${points.length} points, ${recommendations.length} recs, ${departments.length} departments, ${plan.tasks?.departments?.length ?? 0} task departments (from ${planPath})`);

@@ -17,5 +17,7 @@ export type Plan = {
   departments: { name: string; manager: string; designations: string; owns: string; app: string }[];
   gaps: string;
   seedSheets: Record<string, string>[];
+  /** Operations task catalog (who does what); see src/tasks.ts. */
+  tasks?: import("./tasks").TaskCatalog;
 };
 export type Row = Record<string, string> & { id: string };

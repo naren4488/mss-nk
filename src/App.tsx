@@ -9,12 +9,14 @@ import Org from "./pages/Org";
 import Sheets from "./pages/Sheets";
 import Rhythm from "./pages/Rhythm";
 import Recommendations from "./pages/Recommendations";
+import Tasks from "./pages/Tasks";
 
 const PAGES = [
   { id: "dashboard", label: "Dashboard" },
   { id: "points", label: "45 Points" },
   { id: "pending", label: "Issues & Pending" },
   { id: "org", label: "Departments & People" },
+  { id: "tasks", label: "Tasks: who does what" },
   { id: "sheets", label: "Sheets & Data" },
   { id: "rhythm", label: "Operating Rhythm" },
   { id: "recs", label: "Recommendations" },
@@ -190,6 +192,7 @@ function Shell({ plan, onLock }: { plan: Plan; onLock: () => void }) {
         {page === "points" && <Points plan={plan} />}
         {page === "pending" && <Pending plan={plan} />}
         {page === "org" && <Org plan={plan} />}
+        {page === "tasks" && <Tasks plan={plan} />}
         {page === "sheets" && <Sheets plan={plan} />}
         {page === "rhythm" && <Rhythm plan={plan} />}
         {page === "recs" && <Recommendations plan={plan} />}
