@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Plan } from "./types";
-import { forgetPassword, savePassword, savedPassword, unlock } from "./crypto";
+import { WrongPasswordError, forgetPassword, preloadPlan, savePassword, savedPassword, unlock } from "./crypto";
 import { exportAll, importAll } from "./store";
 import Dashboard from "./pages/Dashboard";
 import Points from "./pages/Points";
@@ -31,17 +31,35 @@ const pageFromHash = (): PageId => {
 export default function App() {
   const [plan, setPlan] = useState<Plan | null>(null);
   const [checking, setChecking] = useState(true);
+  const [loadError, setLoadError] = useState("");
 
-  useEffect(() => {
+  function autoLogin() {
     const p = savedPassword();
+    preloadPlan().catch(() => {}); // start the download right away, even before login
     if (!p) return setChecking(false);
+    setChecking(true);
+    setLoadError("");
     unlock(p)
       .then(setPlan)
-      .catch(() => forgetPassword()) // password changed since last visit
+      .catch((e) => {
+        if (e instanceof WrongPasswordError) forgetPassword(); // password changed since last visit
+        else setLoadError(e instanceof Error ? e.message : "Could not load the portal.");
+      })
       .finally(() => setChecking(false));
-  }, []);
+  }
+  useEffect(autoLogin, []);
 
   if (checking) return <div className="center muted">Loading…</div>;
+  if (loadError)
+    return (
+      <div className="center">
+        <div className="login">
+          <h1>MSS-NK</h1>
+          <p className="error">{loadError}</p>
+          <button className="btn primary" onClick={autoLogin}>Retry</button>
+        </div>
+      </div>
+    );
   if (!plan) return <Login onUnlock={setPlan} />;
   return (
     <Shell
@@ -71,8 +89,8 @@ function Login({ onUnlock }: { onUnlock: (p: Plan) => void }) {
             const plan = await unlock(pw);
             savePassword(pw);
             onUnlock(plan);
-          } catch {
-            setErr("Wrong password");
+          } catch (e) {
+            setErr(e instanceof WrongPasswordError ? "Wrong password" : e instanceof Error ? e.message : "Something went wrong");
           } finally {
             setBusy(false);
           }

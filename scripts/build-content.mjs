@@ -10,6 +10,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { webcrypto as crypto } from "node:crypto";
+import { gzipSync } from "node:zlib";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -175,10 +176,12 @@ const key = await crypto.subtle.deriveKey(
   false,
   ["encrypt"],
 );
-const cipher = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, enc.encode(JSON.stringify(plan))));
+// Compress before encrypting: ciphertext does not compress, plaintext JSON does (~5x).
+const packed = gzipSync(enc.encode(JSON.stringify(plan)), { level: 9 });
+const cipher = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, packed));
 const b64 = (u) => Buffer.from(u).toString("base64");
 writeFileSync(
   resolve(root, "public/plan.enc.json"),
-  JSON.stringify({ v: 1, iterations, salt: b64(salt), iv: b64(iv), data: b64(cipher) }),
+  JSON.stringify({ v: 2, z: "gzip", iterations, salt: b64(salt), iv: b64(iv), data: b64(cipher) }),
 );
 console.log(`plan.enc.json: ${points.length} points, ${recommendations.length} recs, ${departments.length} departments, ${plan.tasks?.departments?.length ?? 0} task departments (from ${planPath})`);
