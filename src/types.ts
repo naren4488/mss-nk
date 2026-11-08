@@ -19,5 +19,33 @@ export type Plan = {
   seedSheets: Record<string, string>[];
   /** Operations task catalog (who does what); see src/tasks.ts. */
   tasks?: import("./tasks").TaskCatalog;
+  /** Admin software status, parsed from OVERALL_PROJECT_STATUS.md. */
+  software?: SoftwareStatus;
+};
+
+export type Block =
+  | { t: "p"; text: string }
+  | { t: "ul"; items: { text: string; children: string[] }[] }
+  | { t: "ol"; items: string[] }
+  | { t: "table"; head: string[]; rows: string[][] };
+export type Group = { title: string; note: string; blocks: Block[] };
+export type ModuleKind = "done" | "next" | "pending" | "legacy";
+export type SoftwareModule = {
+  n: number;
+  title: string;
+  what: string;
+  status: string;
+  kind: ModuleKind;
+  tags: Record<"no backend" | "backend only" | "placeholder" | "demo", number>;
+  features: Group[];
+  apis: Block[];
+  review: Group[];
+  text: string;
+  map: { n: number; name: string; screens: string; tables: string; apis: string } | null;
+};
+export type SoftwareStatus = {
+  meta: { updated?: string; repos?: string; purpose?: string; full_endpoint_list?: string };
+  info: { title: string; blocks: Block[] }[];
+  modules: SoftwareModule[];
 };
 export type Row = Record<string, string> & { id: string };
