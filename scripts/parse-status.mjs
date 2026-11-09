@@ -70,8 +70,9 @@ function toGroups(lines) {
 
 function statusKind(s) {
   const x = s.toLowerCase();
-  if (x.includes("reviewed and done")) return "done";
-  if (x.includes("next in the review")) return "next";
+  // "reviewed and done (…)" or "reviewed 8 Nov 2026 (…)"; not "not reviewed" / "review not done"
+  if (/^reviewed\b/.test(x)) return "done";
+  if (x.includes("next in the review") || x.includes("in progress")) return "next";
   if (x.includes("superseded")) return "legacy";
   return "pending";
 }
