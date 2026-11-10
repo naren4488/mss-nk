@@ -9,7 +9,7 @@
 
 const TAG_RE = /\[(no backend|backend only|placeholder|demo)\]/gi;
 
-function toBlocks(lines) {
+export function toBlocks(lines) {
   const blocks = [];
   let i = 0;
   while (i < lines.length) {
@@ -138,4 +138,19 @@ export function parseStatus(md) {
   }
   for (const m of modules) m.map = moduleMap.find((r) => r.n === m.n) || null;
   return { meta, info, modules };
+}
+
+// Test data and logins page block: "# title", "**Updated:** …", then "## section" blocks.
+export function parseTestData(md) {
+  const lines = md.split("\n");
+  const updated = (lines.find((l) => l.startsWith("**Updated:**")) || "").replace("**Updated:**", "").trim();
+  const sections = [];
+  let cur = null;
+  for (const l of lines) {
+    if (l.startsWith("## ")) {
+      cur = { title: l.slice(3).trim(), lines: [] };
+      sections.push(cur);
+    } else if (cur) cur.lines.push(l);
+  }
+  return { updated, sections: sections.map((x) => ({ title: x.title, blocks: toBlocks(x.lines) })) };
 }

@@ -89,6 +89,27 @@ export default function Software({ plan }: { plan: Plan }) {
         ))}
       </section>
 
+      {plan.testData && plan.testData.sections.length > 0 && (
+        <section>
+          <h2>Test data and logins</h2>
+          {plan.testData.updated && <p className="muted small">Updated {plan.testData.updated}</p>}
+          {plan.testData.sections.map((s) => {
+            const id = `td:${s.title}`;
+            return (
+              <Accordion
+                key={id}
+                level={2}
+                open={infoOpen.has(id)}
+                onToggle={() => setInfoOpen((x) => { const y = new Set(x); if (y.has(id)) y.delete(id); else y.add(id); return y; })}
+                header={<span className="acc-name">{s.title}</span>}
+              >
+                <Blocks blocks={s.blocks} />
+              </Accordion>
+            );
+          })}
+        </section>
+      )}
+
       <section>
         <h2>Modules</h2>
         <div className="toolbar">

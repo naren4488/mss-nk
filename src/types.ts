@@ -21,6 +21,8 @@ export type Plan = {
   tasks?: import("./tasks").TaskCatalog;
   /** Admin software status, parsed from OVERALL_PROJECT_STATUS.md. */
   software?: SoftwareStatus;
+  /** Test data and logins (from docs/mss-nk/test-data.md, encrypted). */
+  testData?: { updated: string; sections: { title: string; blocks: Block[] }[] };
 };
 
 export type Block =

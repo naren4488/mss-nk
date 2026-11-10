@@ -11,7 +11,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { webcrypto as crypto } from "node:crypto";
 import { gzipSync } from "node:zlib";
-import { parseStatus } from "./parse-status.mjs";
+import { parseStatus, parseTestData } from "./parse-status.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -35,6 +35,8 @@ const encPath = resolve(root, "public/plan.enc.json");
 const tasksPath = resolve(root, env.TASKS_JSON || "../docs/mss-nk/tasks-catalog.json");
 // Admin software module status (FE + BE), shown on the Admin Software page.
 const statusPath = resolve(root, env.STATUS_MD || "../mahisolarsolution-frontend/docs/OVERALL_PROJECT_STATUS.md");
+// Test data and logins (kept outside git; only the encrypted copy ships).
+const testDataPath = resolve(root, env.TEST_DATA_MD || "../docs/mss-nk/test-data.md");
 
 // On a host (Vercel etc.) the plan markdown and password are not available.
 // Fall back to the committed, already-encrypted plan.
@@ -162,6 +164,7 @@ const plan = {
   rhythm, managerBrings, scorecard, currentOps, done90, departments, gaps, seedSheets,
   tasks: existsSync(tasksPath) ? JSON.parse(readFileSync(tasksPath, "utf8")) : undefined,
   software: existsSync(statusPath) ? parseStatus(readFileSync(statusPath, "utf8")) : undefined,
+  testData: existsSync(testDataPath) ? parseTestData(readFileSync(testDataPath, "utf8")) : undefined,
 };
 if (!plan.software) console.warn(`Software status not found (${statusPath}); the Admin Software page will be empty.`);
 if (!plan.tasks) console.warn(`Task catalog not found (${tasksPath}); the Tasks page will be empty.`);
