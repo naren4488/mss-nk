@@ -9,7 +9,7 @@ export default function Recommendations({ plan }: { plan: Plan }) {
   return (
     <div className="page">
       <h1>Recommendations R1–R{plan.recommendations.length}</h1>
-      <p className="muted">Not in your 45. Adopt only what you agree with.</p>
+      <p className="muted">Not in your {plan.points.length}. Adopt only what you agree with.</p>
       {plan.recommendations.map((r) => {
         const c = choice[r.id] || "Undecided";
         return (

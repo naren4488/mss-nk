@@ -14,7 +14,7 @@ import Software from "./pages/Software";
 
 const PAGES = [
   { id: "dashboard", label: "Dashboard" },
-  { id: "points", label: "45 Points" },
+  { id: "points", label: "Points" }, // shown as "<count> Points"
   { id: "pending", label: "Issues & Pending" },
   { id: "org", label: "Departments & People" },
   { id: "tasks", label: "Tasks: who does what" },
@@ -203,7 +203,7 @@ function Shell({ plan, onLock }: { plan: Plan; onLock: () => void }) {
       <nav className={`side ${menuOpen ? "open" : ""}`}>
         {PAGES.map((p) => (
           <a key={p.id} href={`#/${p.id}`} className={page === p.id ? "active" : ""} onClick={() => setMenuOpen(false)}>
-            {p.label}
+            {p.id === "points" ? `${plan.points.length} Points` : p.label}
           </a>
         ))}
       </nav>
