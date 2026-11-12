@@ -8,7 +8,6 @@ A private management website for the Director of Mahi Solar Solution. It contain
 - the sheets and data register
 - the operating rhythm
 - the R1–R15 recommendations
-- **Admin Software:** the module-by-module status of the admin app (FE + BE), shown as accordions. It is read from `../mahisolarsolution-frontend/docs/OVERALL_PROJECT_STATUS.md`, which can be changed with `STATUS_MD`. Also shows **Test data and logins**, read from `../docs/mss-nk/test-data.md` (outside git; only the encrypted copy ships), which can be changed with `TEST_DATA_MD`. The overall and per-module % complete, the Testing tab and the testing report summary come from `../mahisolarsolution-frontend/docs/TESTING_MODULE_REPORT.md` (`TESTING_MD`).
 
 ## How the password works
 
