@@ -44,8 +44,11 @@ export type SoftwareModule = {
   review: Group[];
   text: string;
   map: { n: number; name: string; screens: string; tables: string; apis: string } | null;
+  testing?: ModuleTesting;
 };
+export type ModuleTesting = { pct: number | null; status: string; groups: { title: string; text: string; items: string[] }[] };
 export type SoftwareStatus = {
+  testing?: { updated: string; overallPct: number | null; overall: Block[]; info: { title: string; blocks: Block[] }[] };
   meta: { updated?: string; repos?: string; purpose?: string; full_endpoint_list?: string };
   info: { title: string; blocks: Block[] }[];
   modules: SoftwareModule[];

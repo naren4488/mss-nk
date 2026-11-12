@@ -226,3 +226,9 @@ tbody tr.static:hover { background: transparent; }
 }
 .seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 .seg button { white-space: nowrap; flex-shrink: 0; }
+
+/* module % complete (from the testing report) */
+.pct { display: inline-flex; align-items: center; gap: 6px; font: 600 0.78rem "Poppins", sans-serif; white-space: nowrap; }
+.pct-bar { width: 44px; height: 5px; border-radius: 999px; background: var(--navy-3); overflow: hidden; display: inline-block; }
+.pct-bar span { display: block; height: 100%; background: var(--yellow); }
+.review-group.test-pending { border-left: 3px solid var(--yellow); padding-left: 10px; }

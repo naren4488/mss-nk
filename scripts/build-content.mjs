@@ -11,7 +11,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { webcrypto as crypto } from "node:crypto";
 import { gzipSync } from "node:zlib";
-import { parseStatus, parseTestData } from "./parse-status.mjs";
+import { parseStatus, parseTestData, parseTesting } from "./parse-status.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -37,6 +37,8 @@ const tasksPath = resolve(root, env.TASKS_JSON || "../docs/mss-nk/tasks-catalog.
 const statusPath = resolve(root, env.STATUS_MD || "../mahisolarsolution-frontend/docs/OVERALL_PROJECT_STATUS.md");
 // Test data and logins (kept outside git; only the encrypted copy ships).
 const testDataPath = resolve(root, env.TEST_DATA_MD || "../docs/mss-nk/test-data.md");
+// Module % complete, done / pending and what to test (Admin Software page).
+const testingPath = resolve(root, env.TESTING_MD || "../mahisolarsolution-frontend/docs/TESTING_MODULE_REPORT.md");
 
 // On a host (Vercel etc.) the plan markdown and password are not available.
 // Fall back to the committed, already-encrypted plan.
@@ -166,6 +168,16 @@ const plan = {
   software: existsSync(statusPath) ? parseStatus(readFileSync(statusPath, "utf8")) : undefined,
   testData: existsSync(testDataPath) ? parseTestData(readFileSync(testDataPath, "utf8")) : undefined,
 };
+if (plan.software && existsSync(testingPath)) {
+  const t = parseTesting(readFileSync(testingPath, "utf8"));
+  plan.software.testing = { updated: t.updated, overallPct: t.overallPct, overall: t.overall, info: t.info };
+  for (const m of plan.software.modules) {
+    const tm = t.modules[m.n];
+    if (!tm) continue;
+    m.testing = { pct: tm.pct ?? null, status: tm.status ?? "", groups: tm.groups ?? [] };
+    m.text += " " + JSON.stringify(m.testing).replace(/[*`]/g, "").toLowerCase();
+  }
+} else if (plan.software) console.warn(`Testing report not found (${testingPath}); module % and testing tabs will be empty.`);
 if (!plan.software) console.warn(`Software status not found (${statusPath}); the Admin Software page will be empty.`);
 if (!plan.tasks) console.warn(`Task catalog not found (${tasksPath}); the Tasks page will be empty.`);
 

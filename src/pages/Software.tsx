@@ -15,7 +15,7 @@ const TAG_LABEL: Record<string, string> = {
   "backend only": "backend only",
   demo: "demo",
 };
-type Tab = "features" | "apis" | "review";
+type Tab = "features" | "apis" | "review" | "testing";
 
 export default function Software({ plan }: { plan: Plan }) {
   const sw = plan.software;
@@ -49,6 +49,13 @@ export default function Software({ plan }: { plan: Plan }) {
       {updatedNote && <p className="small">{updatedNote}</p>}
 
       <div className="tiles">
+        {sw.testing?.overallPct != null && (
+          <div className="tile static">
+            <div className="tile-value">~{sw.testing.overallPct} %</div>
+            <div className="tile-label">Admin software complete</div>
+            <div className="bar" aria-hidden="true"><span style={{ width: `${sw.testing.overallPct}%` }} /></div>
+          </div>
+        )}
         <div className="tile static">
           <div className="tile-value">{done} / {sw.modules.length}</div>
           <div className="tile-label">Modules reviewed</div>
@@ -88,6 +95,28 @@ export default function Software({ plan }: { plan: Plan }) {
           </Accordion>
         ))}
       </section>
+
+      {sw.testing && (
+        <section>
+          <h2>Testing report</h2>
+          {sw.testing.updated && <p className="muted small">Updated {sw.testing.updated}</p>}
+          <Blocks blocks={sw.testing.overall} />
+          {sw.testing.info.map((s) => {
+            const id = `tr:${s.title}`;
+            return (
+              <Accordion
+                key={id}
+                level={2}
+                open={infoOpen.has(id)}
+                onToggle={() => setInfoOpen((x) => { const y = new Set(x); if (y.has(id)) y.delete(id); else y.add(id); return y; })}
+                header={<span className="acc-name">{s.title}</span>}
+              >
+                <Blocks blocks={s.blocks} />
+              </Accordion>
+            );
+          })}
+        </section>
+      )}
 
       {plan.testData && plan.testData.sections.length > 0 && (
         <section>
@@ -146,6 +175,12 @@ function ModuleHeader({ m }: { m: SoftwareModule }) {
         {m.what && <span className="acc-sub"><Md text={m.what} /></span>}
       </span>
       <span className="acc-meta">
+        {m.testing?.pct != null && (
+          <span className="pct" title={m.testing.status || undefined}>
+            <span className="pct-bar" aria-hidden="true"><span style={{ width: `${m.testing.pct}%` }} /></span>
+            {m.testing.pct} %
+          </span>
+        )}
         <span className={`status status-${m.kind}`}>{KIND_LABEL[m.kind]}</span>
         {m.map?.apis && <span className="small muted nowrap">{m.map.apis} APIs</span>}
         {tags.map(([t, n]) => (
@@ -178,6 +213,11 @@ function ModuleBody({ m, query }: { m: SoftwareModule; query: string }) {
           </button>
           <button role="tab" aria-selected={tab === "apis"} className={tab === "apis" ? "on" : ""} onClick={() => setTab("apis")}>APIs</button>
           <button role="tab" aria-selected={tab === "review"} className={tab === "review" ? "on" : ""} onClick={() => setTab("review")}>Review</button>
+          {m.testing && (
+            <button role="tab" aria-selected={tab === "testing"} className={tab === "testing" ? "on" : ""} onClick={() => setTab("testing")}>
+              Testing{m.testing.pct != null ? ` · ${m.testing.pct} %` : ""}
+            </button>
+          )}
         </div>
         {tab === "features" && m.features.length > 1 && (
           <button className="btn ghost small" onClick={() => setOpenGroups(allOpen ? new Set() : new Set(m.features.map((_, i) => i)))}>
@@ -209,6 +249,21 @@ function ModuleBody({ m, query }: { m: SoftwareModule; query: string }) {
         ))}
 
       {tab === "apis" && <Blocks blocks={m.apis} />}
+
+      {tab === "testing" && m.testing && (
+        <div>
+          {m.testing.status && <p className="review-status status-next"><strong>{m.testing.pct} % done:</strong> <Md text={m.testing.status} /></p>}
+          {m.testing.groups.map((g, i) => (
+            <div key={i} className={`review-group test-${g.title.toLowerCase().startsWith("pending") ? "pending" : "other"}`}>
+              <h4><Md text={g.title} /></h4>
+              <div className="blocks">
+                {g.text && <p><Md text={g.text} /></p>}
+                {g.items.length > 0 && <ul>{g.items.map((x, j) => <li key={j}><Md text={x} /></li>)}</ul>}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {tab === "review" && (
         <div>

@@ -154,3 +154,56 @@ export function parseTestData(md) {
   }
   return { updated, sections: sections.map((x) => ({ title: x.title, blocks: toBlocks(x.lines) })) };
 }
+
+// Module status and testing report (mahisolarsolution-frontend/docs/TESTING_MODULE_REPORT.md):
+// "## Overall" with "**About N % complete.**" and a module table, then "## Module by module"
+// with "### N. Title (P %)" sections made of "- **Label:** text" items with nested bullets.
+export function parseTesting(md) {
+  const lines = md.split("\n");
+  const updated = (lines.find((l) => l.startsWith("**Updated:**")) || "").replace("**Updated:**", "").trim();
+  const sections = [];
+  let cur = null;
+  for (const l of lines) {
+    if (l.startsWith("## ")) { cur = { title: l.slice(3).trim(), lines: [] }; sections.push(cur); }
+    else if (cur) cur.lines.push(l);
+  }
+  const info = [];
+  const modules = {};
+  let overall = [];
+  let overallPct = null;
+  for (const s of sections) {
+    if (/^overall/i.test(s.title)) {
+      const blocks = toBlocks(s.lines);
+      const table = blocks.find((b) => b.t === "table");
+      for (const r of table?.rows ?? []) {
+        const n = Number(r[0]);
+        if (n) modules[n] = { ...(modules[n] || {}), status: r[3] || "" };
+      }
+      overall = blocks.filter((b) => b.t !== "table");
+      const m = s.lines.join(" ").match(/About\s+(\d+)\s*%\s*complete/i);
+      if (m) overallPct = Number(m[1]);
+      continue;
+    }
+    if (/^module by module/i.test(s.title)) {
+      let mod = null;
+      let group = null;
+      for (const l of s.lines) {
+        const h = l.match(/^###\s+(\d+)\.\s+(.*?)\s*\((\d+)\s*%\)\s*$/);
+        if (h) {
+          mod = { ...(modules[Number(h[1])] || {}), pct: Number(h[3]), groups: [] };
+          modules[Number(h[1])] = mod;
+          group = null;
+          continue;
+        }
+        if (!mod) continue;
+        const top = l.match(/^- \*\*([^*]+?):\*\*\s*(.*)$/);
+        const child = l.match(/^\s+- (.*)$/);
+        if (top) { group = { title: top[1], text: top[2], items: [] }; mod.groups.push(group); }
+        else if (child && group) group.items.push(child[1]);
+      }
+      continue;
+    }
+    info.push({ title: s.title, blocks: toBlocks(s.lines) });
+  }
+  return { updated, overallPct, overall, info, modules };
+}
