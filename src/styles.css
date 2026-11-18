@@ -170,3 +170,16 @@ tr.done { opacity: 0.55; }
 /* segmented buttons scroll on narrow screens */
 .seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
 .seg button { white-space: nowrap; flex-shrink: 0; }
+
+/* Several-designation picker in forms; holders listed under each department card */
+fieldset.field.multi { border: 0; padding: 0; margin: 0 0 10px; min-width: 0; }
+fieldset.field.multi legend { font-size: 0.8rem; color: var(--muted); padding: 0; margin-bottom: 4px; }
+.multi-pick { display: flex; flex-wrap: wrap; gap: 6px; max-height: 220px; overflow-y: auto; }
+.pick-box { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; cursor: pointer; font-size: 0.85rem; }
+.pick-box.on { border-color: var(--yellow); color: var(--yellow); }
+.pick-box input { accent-color: var(--yellow); margin: 0; width: auto; flex: none; padding: 0; }
+.pick-box span { font-size: inherit; color: inherit; white-space: nowrap; }
+.holders { list-style: none; margin: 6px 0 8px; padding: 0; display: grid; gap: 4px; }
+.holders li { font-size: 0.85rem; display: flex; gap: 6px; flex-wrap: wrap; }
+.holders .role { color: var(--muted); min-width: 0; }
+.holders .role::after { content: ":"; }

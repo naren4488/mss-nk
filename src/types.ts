@@ -17,6 +17,8 @@ export type Plan = {
   departments: { name: string; manager: string; designations: string; owns: string; app: string }[];
   gaps: string;
   seedSheets: Record<string, string>[];
+  /** People register rows from Part 7.2; designation holds several, comma-separated. */
+  seedPeople?: Record<string, string>[];
   /** Operations task catalog (who does what); see src/tasks.ts. */
   tasks?: import("./tasks").TaskCatalog;
 };

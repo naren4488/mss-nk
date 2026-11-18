@@ -5,10 +5,13 @@ import { newId } from "../store";
 export type Column = {
   key: string;
   label: string;
-  type?: "text" | "date" | "select" | "textarea";
+  /** multi: tick several options, saved comma-separated */
+  type?: "text" | "date" | "select" | "textarea" | "multi";
   options?: string[];
   /** shown in the table; hidden columns still appear in the form */
   inTable?: boolean;
+  /** worked out from the row: shown in the table only, never edited */
+  display?: (r: Row) => string;
 };
 
 type Props = {
@@ -58,7 +61,7 @@ export function EditableTable({ columns, rows, setRows, addLabel, empty, default
               {rows.map((r) => (
                 <tr key={r.id} className={rowTone?.(r) ?? ""} onClick={() => setEditing(r)} title="Click to edit">
                   {visible.map((c) => (
-                    <td key={c.key}>{r[c.key] || <span className="muted">—</span>}</td>
+                    <td key={c.key}>{(c.display ? c.display(r) : r[c.key]) || <span className="muted">—</span>}</td>
                   ))}
                 </tr>
               ))}
@@ -108,7 +111,12 @@ function RowForm({
         }}
       >
         <h3>{isNew ? "Add" : "Edit"}</h3>
-        {columns.map((c) => (
+        {columns.filter((c) => !c.display).map((c) => c.type === "multi" ? (
+          <fieldset key={c.key} className="field multi">
+            <legend>{c.label}</legend>
+            <MultiPick options={c.options ?? []} value={draft[c.key] ?? ""} onChange={(v) => set(c.key, v)} />
+          </fieldset>
+        ) : (
           <label key={c.key} className="field">
             <span>{c.label}</span>
             {c.type === "select" ? (
@@ -140,6 +148,28 @@ function RowForm({
           </button>
         </div>
       </form>
+    </div>
+  );
+}
+
+/** Tick boxes; the value is a comma-separated list in the options' order (unknown old values kept at the end). */
+function MultiPick({ options, value, onChange }: { options: string[]; value: string; onChange: (v: string) => void }) {
+  const picked = value.split(",").map((x) => x.trim()).filter(Boolean);
+  const has = (o: string) => picked.some((p) => p.toLowerCase() === o.toLowerCase());
+  const extra = picked.filter((p) => !options.some((o) => o.toLowerCase() === p.toLowerCase()));
+  function toggle(o: string) {
+    const next = has(o) ? picked.filter((p) => p.toLowerCase() !== o.toLowerCase()) : [...picked, o];
+    const ordered = options.filter((x) => next.some((p) => p.toLowerCase() === x.toLowerCase()));
+    onChange([...ordered, ...extra.filter((e) => next.includes(e))].join(", "));
+  }
+  return (
+    <div className="multi-pick">
+      {[...options, ...extra].map((o) => (
+        <label key={o} className={`pick-box ${has(o) ? "on" : ""}`}>
+          <input type="checkbox" checked={has(o)} onChange={() => toggle(o)} />
+          <span>{o}</span>
+        </label>
+      ))}
     </div>
   );
 }

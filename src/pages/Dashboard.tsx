@@ -6,7 +6,7 @@ import { Md } from "../md";
 export default function Dashboard({ plan }: { plan: Plan }) {
   const [state] = usePointState();
   const [pending] = usePending();
-  const [people] = usePeople();
+  const [people] = usePeople(plan);
   const [sheets] = useSheets(plan);
   const [managers] = useDeptManagers();
 

@@ -146,6 +146,13 @@ const departments = tableRows(s71).map(([name, manager, designations, owns, app]
 }));
 const gapsLine = part7.find((l) => l.startsWith("**Known gaps"));
 const gaps = gapsLine ? gapsLine.replace(/^\*\*Known gaps[^*]*\*\*\s*/, "") : "";
+// 7.2 People register: one row per employee; designations comma-separated (several per person).
+const s72 = part7.slice(part7.findIndex((l) => l.startsWith("### 7.2")), part7.findIndex((l) => l.startsWith("### 7.3")));
+const seedPeople = tableRows(s72)
+  .filter((r) => r[0] && !r[0].startsWith("_"))
+  .map(([name, , designation, reportsTo, responsibilities, sheets, checkpoints, backup]) => ({
+    name, designation, reportsTo, responsibilities, sheets, checkpoints, backup,
+  }));
 const s73 = part7.slice(part7.findIndex((l) => l.startsWith("### 7.3")));
 const seedSheets = tableRows(s73)
   .filter((r) => !r[0].startsWith("_"))
@@ -156,7 +163,7 @@ const updated = (lines.find((l) => l.startsWith("**Updated:**")) || "").replace(
 
 const plan = {
   updated, leadershipRule, groups, points, loops, failurePatterns, first90, guidance, recommendations,
-  rhythm, managerBrings, scorecard, currentOps, done90, departments, gaps, seedSheets,
+  rhythm, managerBrings, scorecard, currentOps, done90, departments, gaps, seedSheets, seedPeople,
   tasks: existsSync(tasksPath) ? JSON.parse(readFileSync(tasksPath, "utf8")) : undefined,
 };
 if (!plan.tasks) console.warn(`Task catalog not found (${tasksPath}); the Tasks page will be empty.`);
@@ -184,4 +191,4 @@ writeFileSync(
   resolve(root, "public/plan.enc.json"),
   JSON.stringify({ v: 2, z: "gzip", iterations, salt: b64(salt), iv: b64(iv), data: b64(cipher) }),
 );
-console.log(`plan.enc.json: ${points.length} points, ${recommendations.length} recs, ${departments.length} departments, ${plan.tasks?.departments?.length ?? 0} task departments (from ${planPath})`);
+console.log(`plan.enc.json: ${points.length} points, ${recommendations.length} recs, ${departments.length} departments, ${seedPeople.length} people, ${plan.tasks?.departments?.length ?? 0} task departments (from ${planPath})`);
