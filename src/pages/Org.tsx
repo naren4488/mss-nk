@@ -66,7 +66,7 @@ export default function Org({ plan }: { plan: Plan }) {
             { key: "name", label: "Employee" },
             { key: "department", label: "Department", display: (r) => personDepts(plan, r).join(", ") },
             { key: "designation", label: "Designations", type: "multi", options: designationList(plan).map((x) => x.name) },
-            { key: "reportsTo", label: "Reports to", type: "select", options: names },
+            { key: "reportsTo", label: "Reports to", type: "multi", options: names },
             { key: "responsibilities", label: "Top 5 responsibilities", type: "textarea", inTable: false },
             { key: "sheets", label: "Sheets / data they maintain", type: "textarea" },
             { key: "checkpoints", label: "Checkpoints they verify (44)", type: "textarea", inTable: false },
