@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { Row } from "../types";
 import { newId } from "../store";
 
@@ -22,9 +22,15 @@ type Props = {
   empty: string;
   defaults?: Record<string, string>;
   rowTone?: (r: Row) => "warn" | "done" | undefined;
+  /** shown in the toolbar after the add button (filters, view switch) */
+  toolbarExtra?: ReactNode;
+  /** rows to show (filtered); all rows are still saved */
+  shown?: Row[];
+  /** another way to show the rows instead of the table; call edit(row) to open the form */
+  view?: (rows: Row[], edit: (r: Row) => void) => ReactNode;
 };
 
-export function EditableTable({ columns, rows, setRows, addLabel, empty, defaults = {}, rowTone }: Props) {
+export function EditableTable({ columns, rows, setRows, addLabel, empty, defaults = {}, rowTone, toolbarExtra, shown, view }: Props) {
   const [editing, setEditing] = useState<Row | null>(null);
   const visible = columns.filter((c) => c.inTable !== false);
 
@@ -43,10 +49,13 @@ export function EditableTable({ columns, rows, setRows, addLabel, empty, default
         <button className="btn primary" onClick={() => setEditing({ id: newId(), ...defaults } as Row)}>
           + {addLabel}
         </button>
-        <span className="muted">{rows.length} rows</span>
+        <span className="muted">{shown && shown.length !== rows.length ? `${shown.length} of ${rows.length}` : rows.length} rows</span>
+        {toolbarExtra}
       </div>
       {rows.length === 0 ? (
         <p className="empty">{empty}</p>
+      ) : view ? (
+        view(shown ?? rows, setEditing)
       ) : (
         <div className="table-wrap">
           <table>
@@ -58,7 +67,7 @@ export function EditableTable({ columns, rows, setRows, addLabel, empty, default
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {(shown ?? rows).map((r) => (
                 <tr key={r.id} className={rowTone?.(r) ?? ""} onClick={() => setEditing(r)} title="Click to edit">
                   {visible.map((c) => (
                     <td key={c.key}>{(c.display ? c.display(r) : r[c.key]) || <span className="muted">—</span>}</td>
