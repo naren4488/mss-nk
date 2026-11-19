@@ -54,7 +54,12 @@ export default function App() {
     return (
       <div className="center">
         <div className="login">
-          <h1>MSS-NK</h1>
+          <div className="brand">
+            <span className="brand-mark" aria-hidden>
+              M
+            </span>
+            MSS-NK
+          </div>
           <p className="error">{loadError}</p>
           <button className="btn primary" onClick={autoLogin}>Retry</button>
         </div>
@@ -96,7 +101,12 @@ function Login({ onUnlock }: { onUnlock: (p: Plan) => void }) {
           }
         }}
       >
-        <h1>MSS-NK</h1>
+        <div className="brand">
+          <span className="brand-mark" aria-hidden>
+            M
+          </span>
+          MSS-NK
+        </div>
         <p className="muted">Management portal — Mahi Solar Solution</p>
         <div className="pw-wrap">
           <input
@@ -185,9 +195,14 @@ function Shell({ plan, onLock }: { plan: Plan; onLock: () => void }) {
         <button className="btn ghost menu" onClick={() => setMenuOpen((o) => !o)} aria-label="Menu">
           ☰
         </button>
-        <div className="brand">MSS-NK</div>
+        <div className="brand">
+          <span className="brand-mark" aria-hidden>
+            M
+          </span>
+          MSS-NK
+        </div>
         <span className="muted small hide-sm">Plan updated {plan.updated}</span>
-        <span style={{ flex: 1 }} />
+        <span className="top-spacer" />
         <button className="btn ghost small" onClick={backup} title="Download everything you entered">
           Backup
         </button>

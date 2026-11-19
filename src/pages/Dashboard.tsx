@@ -22,6 +22,7 @@ export default function Dashboard({ plan }: { plan: Plan }) {
   return (
     <div className="page">
       <h1>Dashboard</h1>
+      <p className="page-lead">Overview of points, issues, people, and your operating rhythm.</p>
       <p className="rule"><Md text={plan.leadershipRule} /></p>
 
       <div className="tiles">
