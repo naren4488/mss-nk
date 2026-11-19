@@ -2,7 +2,7 @@
 
 A private management website for the Director of Mahi Solar Solution. It contains:
 
-- the director's points (48 now), with a status, owner and note for each
+- the director's points (50 now), with a status, owner and note for each
 - the issues and pending-work list (point 40)
 - departments and the people register
 - the sheets and data register
